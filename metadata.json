@@ -1,0 +1,7 @@
+{
+  "name": "ProbatePro - Court Prep Assistant",
+  "description": "A specialized AI tool designed to help pro se litigants prepare for probate and trust court hearings through document analysis and personalized chat coaching.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
