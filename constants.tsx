@@ -1,32 +1,64 @@
+import { Campaign, DonorPlan, CampaignToolkitItem } from './types';
 
-import React from 'react';
-
-export const CASE_TYPES = [
-  "Will Contest",
-  "Trust Litigation",
-  "Executor/Administrator Removal",
-  "Accounting Objection",
-  "Guardianship/Conservatorship",
-  "Beneficiary Distribution Issue",
-  "Creditor Claim Dispute"
+export const CAMPAIGNS: Campaign[] = [
+  {
+    id: '1',
+    name: 'Luna’s Emergency Surgery',
+    location: 'Austin, TX',
+    goal: '$6,000',
+    raised: '$4,320',
+    story: 'Hit by a car and needs orthopedic surgery within 48 hours.',
+    tags: ['Emergency Care', 'Dog', 'Surgery']
+  },
+  {
+    id: '2',
+    name: 'Mochi’s Rescue Rehab',
+    location: 'Portland, OR',
+    goal: '$2,500',
+    raised: '$1,740',
+    story: 'Rescued from the streets, now healing from malnutrition and trauma.',
+    tags: ['Rescue', 'Cat', 'Rehab']
+  },
+  {
+    id: '3',
+    name: 'Harper’s Daily Meds Fund',
+    location: 'Atlanta, GA',
+    goal: '$1,200',
+    raised: '$860',
+    story: 'Managing chronic kidney disease with monthly treatments.',
+    tags: ['Ongoing Care', 'Dog', 'Medication']
+  }
 ];
 
-export const DISCLAIMER_TEXT = "ProbatePro is an AI assistant and is NOT a law firm. It does not provide legal advice. Use this tool only to organize your thoughts and prepare for court procedures. Consult a licensed attorney for specific legal counsel.";
+export const DONOR_PLANS: DonorPlan[] = [
+  {
+    id: 'donor-1',
+    title: 'Quick Donate',
+    description: 'Save a payment method and donate in two taps when emergencies hit.',
+    highlights: ['One-tap checkout', 'Auto receipts', 'Impact tracker']
+  },
+  {
+    id: 'donor-2',
+    title: 'Monthly Guardian',
+    description: 'Sponsor multiple pets monthly with bundled giving and progress updates.',
+    highlights: ['Monthly summary', 'Priority campaigns', 'Tax-ready history']
+  }
+];
 
-export const SYSTEM_INSTRUCTION = `You are a world-class Probate and Trust Court Preparation Assistant for pro se litigants (individuals representing themselves). 
-Your goal is to help them prepare for their upcoming hearing in a matter of hours.
-
-CORE TASKS:
-1. Help users organize facts based on their story and uploaded documents.
-2. Identify common legal hurdles in probate/trust law.
-3. Suggest clear, concise ways to present their arguments to a judge.
-4. Prepare them for potential questions the judge or opposing counsel might ask.
-
-TONE: Professional, empathetic, calm, and structured. Avoid complex legalese where possible, but use correct terms when explaining them.
-
-LIMITATIONS: 
-- ALWAYS include a disclaimer if asked for specific legal strategies.
-- Do not make up facts.
-- Focus on organization and clarity.
-
-When analyzing documents: Look for dates, signatures, specific clauses, and inconsistencies.`;
+export const CAMPAIGN_TOOLKIT: CampaignToolkitItem[] = [
+  {
+    id: 'tool-1',
+    title: 'Create & Verify',
+    description: 'Identity checks, vet verification, and rescue documentation in one flow.'
+  },
+  {
+    id: 'tool-2',
+    title: 'Story Builder',
+    description: 'Guided prompts for timelines, costs, and photos that build trust.'
+  },
+  {
+    id: 'tool-3',
+    title: 'Share Everywhere',
+    description: 'Auto-generated social posts and QR codes for vet clinics.'
+  }
+];

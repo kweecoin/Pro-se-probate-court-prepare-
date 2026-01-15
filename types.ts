@@ -1,31 +1,22 @@
-
-export interface Message {
-  role: 'user' | 'model';
-  text: string;
-  timestamp: Date;
-}
-
-export interface LegalDocument {
+export interface Campaign {
   id: string;
   name: string;
-  type: string;
-  size: number;
-  base64: string;
-  analysis?: string;
+  location: string;
+  goal: string;
+  raised: string;
+  story: string;
+  tags: string[];
 }
 
-export interface CourtPrepReport {
-  hearingDate?: string;
-  caseType: string;
-  keyFacts: string[];
-  keyArguments: string[];
-  suggestedQuestions: string[];
-  proceduralTips: string[];
+export interface DonorPlan {
+  id: string;
+  title: string;
+  description: string;
+  highlights: string[];
 }
 
-export enum AppStep {
-  INITIAL = 'initial',
-  DOCUMENTS = 'documents',
-  CHAT = 'chat',
-  REPORT = 'report'
+export interface CampaignToolkitItem {
+  id: string;
+  title: string;
+  description: string;
 }

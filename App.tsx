@@ -1,299 +1,256 @@
-
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import Layout from './components/Layout';
-import { AppStep, Message, LegalDocument, CourtPrepReport } from './types';
-import { CASE_TYPES, DISCLAIMER_TEXT } from './constants';
-import { chatWithAI, generateReport } from './services/geminiService';
+import { CAMPAIGNS, CAMPAIGN_TOOLKIT, DONOR_PLANS } from './constants';
 
 const App: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState<AppStep>(AppStep.INITIAL);
-  const [caseType, setCaseType] = useState<string>('');
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [documents, setDocuments] = useState<LegalDocument[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
-  const [report, setReport] = useState<string>('');
-  const [userInput, setUserInput] = useState('');
-
-  // Initial greeting
-  useEffect(() => {
-    if (messages.length === 0) {
-      setMessages([{
-        role: 'model',
-        text: "Welcome to ProbatePro. Dealing with court can be stressful, but I'm here to help you get organized. What kind of hearing or issue are you preparing for today?",
-        timestamp: new Date()
-      }]);
-    }
-  }, []);
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      // Explicitly type file as File to fix 'unknown' type errors reported in line 36-38, 43
-      Array.from(e.target.files).forEach((file: File) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const base64 = (event.target?.result as string).split(',')[1];
-          const newDoc: LegalDocument = {
-            id: Math.random().toString(36).substr(2, 9),
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            base64: base64
-          };
-          setDocuments(prev => [...prev, newDoc]);
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-  };
-
-  const removeDocument = (id: string) => {
-    setDocuments(prev => prev.filter(d => d.id !== id));
-  };
-
-  const sendMessage = async () => {
-    if (!userInput.trim()) return;
-
-    const userMsg: Message = {
-      role: 'user',
-      text: userInput,
-      timestamp: new Date()
-    };
-
-    const newMessages = [...messages, userMsg];
-    setMessages(newMessages);
-    setUserInput('');
-    setIsTyping(true);
-
-    try {
-      const responseText = await chatWithAI(newMessages, documents);
-      setMessages(prev => [...prev, {
-        role: 'model',
-        text: responseText,
-        timestamp: new Date()
-      }]);
-    } catch (err) {
-      console.error(err);
-      setMessages(prev => [...prev, {
-        role: 'model',
-        text: "I encountered an error. Please check your connection and try again.",
-        timestamp: new Date()
-      }]);
-    } finally {
-      setIsTyping(false);
-    }
-  };
-
-  const createReport = async () => {
-    setIsTyping(true);
-    setCurrentStep(AppStep.REPORT);
-    try {
-      const reportContent = await generateReport(messages, documents);
-      setReport(reportContent);
-    } catch (err) {
-      console.error(err);
-      setReport("Failed to generate report. Please try again.");
-    } finally {
-      setIsTyping(false);
-    }
-  };
-
   return (
-    <Layout currentStep={currentStep} onStepChange={setCurrentStep}>
-      {currentStep === AppStep.INITIAL && (
-        <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in duration-500">
-          <div className="text-center space-y-4">
-            <h2 className="text-4xl font-bold text-slate-900 serif">Prepare for Court in Hours</h2>
-            <p className="text-lg text-slate-600">Representing yourself is hard. ProbatePro helps you organize facts, analyze documents, and practice for the judge.</p>
+    <Layout>
+      <section className="bg-gradient-to-br from-emerald-50 via-white to-amber-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center">
+          <div className="space-y-6">
+            <p className="inline-flex items-center gap-2 rounded-full bg-emerald-100 text-emerald-700 px-4 py-1 text-xs font-semibold uppercase tracking-wide">
+              Pet emergency crowdfunding
+            </p>
+            <h1 className="text-4xl sm:text-5xl font-semibold text-slate-900 leading-tight">
+              A classy, trusted home for the pets who need us most.
+            </h1>
+            <p className="text-lg text-slate-600">
+              PawPromise brings donors and campaign makers together with transparent vet verification, instant payouts, and a polished experience built for urgent care.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <button className="px-6 py-3 rounded-full bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
+                Start a Campaign
+              </button>
+              <button className="px-6 py-3 rounded-full border border-slate-300 text-slate-700 font-semibold hover:border-emerald-500 hover:text-emerald-600 transition">
+                Browse Campaigns
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-6 text-sm text-slate-500">
+              <div>
+                <p className="font-semibold text-slate-900">3% platform fee</p>
+                <p>Only a 3% charge off the top of each donation.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-slate-900">Stripe powered</p>
+                <p>Secure checkout with Apple Pay and cards.</p>
+              </div>
+            </div>
           </div>
+          <div className="bg-white shadow-xl rounded-3xl border border-slate-200 p-6 space-y-4">
+            <h2 className="text-lg font-semibold">Quick donor sign up</h2>
+            <p className="text-sm text-slate-500">Create a donor profile to follow pets, track impact, and donate fast.</p>
+            <div className="space-y-3">
+              <input className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Full name" />
+              <input className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Email address" />
+              <button className="w-full rounded-xl bg-slate-900 text-white py-3 text-sm font-semibold hover:bg-slate-800">Create donor account</button>
+            </div>
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-700">
+              Verified donors get priority access to time-sensitive campaigns.
+            </div>
+          </div>
+        </div>
+      </section>
 
-          <div className="bg-white rounded-2xl p-8 shadow-xl border border-slate-100">
-            <h3 className="text-xl font-semibold mb-6 text-slate-800">Choose Your Case Type</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {CASE_TYPES.map(type => (
-                <button
-                  key={type}
-                  onClick={() => { setCaseType(type); setCurrentStep(AppStep.DOCUMENTS); }}
-                  className="flex items-center justify-between p-4 rounded-xl border-2 border-slate-100 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-left"
-                >
-                  <span className="font-medium text-slate-700">{type}</span>
-                  <div className="text-emerald-500">→</div>
-                </button>
+      <section id="donor" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] items-start">
+          <div className="space-y-4">
+            <h2 className="text-3xl font-semibold">Donor dashboard built for momentum</h2>
+            <p className="text-slate-600">
+              Discover verified campaigns, follow progress in real time, and send love with one-tap Stripe checkout.
+            </p>
+            <div className="grid gap-4">
+              {DONOR_PLANS.map(plan => (
+                <div key={plan.id} className="rounded-2xl border border-slate-200 p-5 bg-white shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-slate-900">{plan.title}</h3>
+                    <span className="text-xs text-emerald-600 font-semibold">Donor</span>
+                  </div>
+                  <p className="text-sm text-slate-500 mt-2">{plan.description}</p>
+                  <ul className="mt-4 grid gap-2 text-sm text-slate-600">
+                    {plan.highlights.map(item => (
+                      <li key={item} className="flex items-center gap-2">
+                        <span className="text-emerald-500">●</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
             </div>
-            <p className="mt-8 p-4 bg-amber-50 rounded-lg text-sm text-amber-800 border border-amber-200">
-              <strong>Notice:</strong> {DISCLAIMER_TEXT}
-            </p>
           </div>
-        </div>
-      )}
-
-      {currentStep === AppStep.DOCUMENTS && (
-        <div className="max-w-3xl mx-auto space-y-6">
-          <div className="bg-white rounded-2xl p-8 shadow-xl border border-slate-100">
-            <h2 className="text-2xl font-bold mb-4 text-slate-900 serif">Upload Evidence & Filings</h2>
-            <p className="text-slate-600 mb-6">Upload Wills, Trusts, Petitions, or Emails. I will analyze them to help build your case arguments.</p>
-            
-            <div className="border-2 border-dashed border-slate-200 rounded-xl p-10 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer relative">
-              <input 
-                type="file" 
-                multiple 
-                onChange={handleFileUpload} 
-                className="absolute inset-0 opacity-0 cursor-pointer"
-              />
-              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-                <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                </svg>
-              </div>
-              <p className="text-slate-700 font-medium">Click to upload files</p>
-              <p className="text-slate-400 text-sm mt-1">PDF, JPG, PNG, DOCX</p>
+          <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Donor feed</h3>
+              <button className="text-xs px-3 py-1 rounded-full border border-slate-700">Live</button>
             </div>
-
-            {documents.length > 0 && (
-              <div className="mt-8 space-y-3">
-                <h4 className="font-semibold text-slate-800">Uploaded Documents ({documents.length})</h4>
-                {documents.map(doc => (
-                  <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-white rounded shadow-sm">📄</div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-800 truncate max-w-[200px]">{doc.name}</p>
-                        <p className="text-xs text-slate-500">{(doc.size / 1024).toFixed(1)} KB</p>
-                      </div>
+            <div className="mt-6 space-y-4">
+              {CAMPAIGNS.map(campaign => (
+                <div key={campaign.id} className="rounded-2xl bg-slate-800 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold">{campaign.name}</p>
+                      <p className="text-xs text-slate-400">{campaign.location}</p>
                     </div>
-                    <button onClick={() => removeDocument(doc.id)} className="text-slate-400 hover:text-red-500 px-2 text-xl">&times;</button>
+                    <button className="text-xs bg-emerald-500 text-slate-900 px-3 py-1 rounded-full font-semibold">Donate</button>
                   </div>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-10 flex justify-end">
-              <button
-                onClick={() => setCurrentStep(AppStep.CHAT)}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-md flex items-center gap-2"
-              >
-                Proceed to Prep Session <span>→</span>
-              </button>
+                  <p className="text-xs text-slate-300 mt-2">{campaign.story}</p>
+                  <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-emerald-200">
+                    {campaign.tags.map(tag => (
+                      <span key={tag} className="px-2 py-1 rounded-full bg-emerald-500/10">{tag}</span>
+                    ))}
+                  </div>
+                  <div className="mt-3 text-xs text-slate-400">Raised {campaign.raised} of {campaign.goal}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      )}
+      </section>
 
-      {currentStep === AppStep.CHAT && (
-        <div className="max-w-4xl mx-auto h-[70vh] flex flex-col bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
-          <div className="p-4 bg-slate-900 text-white flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <h3 className="font-semibold text-sm uppercase tracking-wider">Active Prep Session: {caseType}</h3>
+      <section id="campaigns" className="bg-white border-y border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h2 className="text-3xl font-semibold">Browse verified campaigns</h2>
+              <p className="text-slate-600">Search by urgency, species, or location. Every campaign is verified by a vet or rescue partner.</p>
             </div>
-            <button 
-              onClick={createReport}
-              className="bg-emerald-500 hover:bg-emerald-400 text-slate-900 px-4 py-1.5 rounded-lg text-xs font-bold transition-all"
-            >
-              Finish & Generate Plan
-            </button>
+            <div className="flex gap-2">
+              <input className="rounded-full border border-slate-200 px-4 py-2 text-sm" placeholder="Search campaigns" />
+              <button className="rounded-full bg-slate-900 text-white px-4 py-2 text-sm">Search</button>
+            </div>
           </div>
-
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-            {messages.map((msg, i) => (
-              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-4 rounded-2xl shadow-sm ${
-                  msg.role === 'user' 
-                    ? 'bg-emerald-600 text-white rounded-tr-none' 
-                    : 'bg-slate-100 text-slate-800 rounded-tl-none'
-                }`}>
-                  <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed">{msg.text}</p>
-                  <p className={`text-[10px] mt-2 opacity-60 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {CAMPAIGNS.map(campaign => (
+              <div key={campaign.id} className="rounded-2xl border border-slate-200 p-5 shadow-sm">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold text-slate-900">{campaign.name}</h3>
+                    <p className="text-xs text-slate-500">{campaign.location}</p>
+                  </div>
+                  <span className="text-xs text-emerald-600 font-semibold">Verified</span>
                 </div>
+                <p className="text-sm text-slate-600 mt-3">{campaign.story}</p>
+                <div className="mt-4 text-xs text-slate-500">{campaign.raised} raised of {campaign.goal}</div>
+                <button className="mt-4 w-full rounded-xl border border-slate-200 py-2 text-sm font-semibold hover:border-emerald-500 hover:text-emerald-600">View campaign</button>
               </div>
             ))}
-            {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-slate-100 p-4 rounded-2xl rounded-tl-none flex gap-1 items-center">
-                  <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="makers" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] items-start">
+          <div className="space-y-5">
+            <h2 className="text-3xl font-semibold">Campaign maker studio</h2>
+            <p className="text-slate-600">Create campaigns with proof of care, upload photos, and manage every donor update from one dashboard.</p>
+            <div className="grid gap-4">
+              {CAMPAIGN_TOOLKIT.map(item => (
+                <div key={item.id} className="rounded-2xl border border-slate-200 p-5 bg-white shadow-sm">
+                  <h3 className="font-semibold">{item.title}</h3>
+                  <p className="text-sm text-slate-500 mt-2">{item.description}</p>
+                </div>
+              ))}
+            </div>
+            <button className="px-6 py-3 rounded-full bg-emerald-600 text-white font-semibold hover:bg-emerald-700">Create a campaign</button>
+          </div>
+          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">My campaigns</h3>
+              <span className="text-xs text-slate-500">Owner view</span>
+            </div>
+            <div className="mt-6 space-y-4">
+              <div className="rounded-2xl bg-white p-4 border border-slate-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-slate-900">Rocket’s Recovery</p>
+                    <p className="text-xs text-slate-500">Photos, updates, donor messages</p>
+                  </div>
+                  <button className="text-xs px-3 py-1 rounded-full border border-slate-200">Manage</button>
+                </div>
+                <div className="mt-4 flex gap-2 text-xs">
+                  <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">Create update</span>
+                  <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-600">Upload photos</span>
                 </div>
               </div>
-            )}
-          </div>
-
-          <div className="p-4 border-t border-slate-100 bg-slate-50">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                placeholder="Ask a question or explain your side of the story..."
-                className="flex-1 p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-              />
-              <button
-                onClick={sendMessage}
-                disabled={!userInput.trim() || isTyping}
-                className="bg-slate-900 text-white p-3 rounded-xl hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center w-12"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-              </button>
-            </div>
-            <p className="text-[10px] text-slate-400 mt-2 text-center">Tip: Mention specific dates or document clauses for better results.</p>
-          </div>
-        </div>
-      )}
-
-      {currentStep === AppStep.REPORT && (
-        <div className="max-w-4xl mx-auto space-y-6 animate-in zoom-in-95 duration-500">
-          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100 print:shadow-none">
-            <div className="bg-emerald-600 p-8 text-white">
-              <h2 className="text-3xl font-bold serif">Your Court Preparation Strategy</h2>
-              <p className="mt-2 text-emerald-100">Personalized summary for {caseType}</p>
-            </div>
-            
-            <div className="p-8 sm:p-12 prose prose-slate max-w-none">
-              {isTyping ? (
-                <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                  <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-slate-500 font-medium animate-pulse">Assembling your final preparation plan...</p>
+              <div className="rounded-2xl bg-white p-4 border border-slate-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-slate-900">Whiskers Dental Fund</p>
+                    <p className="text-xs text-slate-500">Ongoing care plan</p>
+                  </div>
+                  <button className="text-xs px-3 py-1 rounded-full border border-slate-200">Manage</button>
                 </div>
-              ) : (
-                <div className="whitespace-pre-wrap text-slate-800 leading-relaxed font-normal">
-                  {report || "No report content available. Try chatting more with the assistant first."}
+                <div className="mt-4 flex gap-2 text-xs">
+                  <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">Share campaign</span>
+                  <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-600">Message donors</span>
                 </div>
-              )}
-            </div>
-
-            <div className="p-6 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4 print:hidden">
-              <button 
-                onClick={() => window.print()}
-                className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 012-2H5a2 2 0 012 2v4a2 2 0 002 2z" />
-                </svg>
-                Print for Court
-              </button>
-              <button 
-                onClick={() => setCurrentStep(AppStep.CHAT)}
-                className="text-slate-600 font-semibold hover:text-emerald-600 transition-all"
-              >
-                ← Back to Prep Session
-              </button>
-            </div>
-          </div>
-          
-          <div className="p-6 bg-white rounded-xl border-l-4 border-emerald-500 shadow-sm flex items-start gap-4">
-            <div className="text-2xl">💡</div>
-            <div>
-              <h4 className="font-bold text-slate-900">Final Tip</h4>
-              <p className="text-slate-600 text-sm">Review this cheat sheet at least 3 times before your hearing. Bring 3 copies of every document (one for the judge, one for opposing counsel, and one for yourself).</p>
+              </div>
+              <div className="rounded-2xl border border-dashed border-slate-300 p-4 text-center text-sm text-slate-500">+ Create new campaign</div>
             </div>
           </div>
         </div>
-      )}
+      </section>
+
+      <section id="pricing" className="bg-emerald-50 border-y border-emerald-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid gap-10 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <h2 className="text-3xl font-semibold">Transparent fees, instant payouts</h2>
+            <p className="text-slate-600 mt-4">
+              Every donation uses Stripe Connect. PawPromise only takes 3% off the top to keep the platform secure, verified, and classy.
+            </p>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl bg-white border border-slate-200 p-5">
+                <h3 className="font-semibold">Stripe integration</h3>
+                <p className="text-sm text-slate-500 mt-2">Apple Pay, ACH, cards, and instant transfers.</p>
+              </div>
+              <div className="rounded-2xl bg-white border border-slate-200 p-5">
+                <h3 className="font-semibold">Secure databases</h3>
+                <p className="text-sm text-slate-500 mt-2">Separate donor and campaign maker records with verification logs.</p>
+              </div>
+              <div className="rounded-2xl bg-white border border-slate-200 p-5">
+                <h3 className="font-semibold">Automatic 3% fee</h3>
+                <p className="text-sm text-slate-500 mt-2">Fee deducted before payout, visible on every receipt.</p>
+              </div>
+              <div className="rounded-2xl bg-white border border-slate-200 p-5">
+                <h3 className="font-semibold">Receipts & analytics</h3>
+                <p className="text-sm text-slate-500 mt-2">Downloadable receipts and progress analytics for transparency.</p>
+              </div>
+            </div>
+          </div>
+          <div className="rounded-3xl bg-slate-900 text-white p-6 shadow-xl">
+            <h3 className="text-lg font-semibold">Stripe payout example</h3>
+            <p className="text-sm text-slate-400 mt-2">Donation amount: $100</p>
+            <div className="mt-6 space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span>Platform fee (3%)</span>
+                <span>$3.00</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Stripe processing</span>
+                <span>$2.90</span>
+              </div>
+              <div className="border-t border-slate-700 pt-3 flex justify-between font-semibold text-white">
+                <span>Net payout</span>
+                <span>$94.10</span>
+              </div>
+            </div>
+            <button className="mt-6 w-full rounded-xl bg-emerald-500 text-slate-900 py-3 text-sm font-semibold">Talk to sales</button>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="rounded-3xl border border-slate-200 bg-white p-8 lg:p-12 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div>
+            <h2 className="text-3xl font-semibold">Ready to rescue more pets?</h2>
+            <p className="text-slate-600 mt-2">Launch a campaign or become a donor today.</p>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-6 py-3 rounded-full bg-slate-900 text-white font-semibold">Donor signup</button>
+            <button className="px-6 py-3 rounded-full border border-slate-300 text-slate-700 font-semibold hover:border-emerald-500 hover:text-emerald-600">Campaign signup</button>
+          </div>
+        </div>
+      </section>
     </Layout>
   );
 };
